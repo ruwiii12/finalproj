@@ -19,6 +19,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    #insert here the needed urls for the app
+    #Employees
+    path('', views.EmployeesPage, name='employees'),
+    path('create/', views.CreateEmployee, name='create_employee'),
+    path('update/<int:pk>/', views.UpdateEmployee, name='update_employee'),
+    path('delete/<int:pk>/', views.DeleteEmployee, name='delete_employee'),
+    path('overtime/<int:pk>/', views.AddOvertime, name='add_overtime'),
+
+    #Payslips
+    path('payslips/', views.PayslipPage, name='payslips'),
+    path('payslip/<int:pk>/', views.ViewPayslip, name='view_payslip'),
 ]
