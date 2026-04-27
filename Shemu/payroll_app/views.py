@@ -1,9 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-<<<<<<< HEAD
-from .models import Employee
-
-# Create your views here.
-=======
 from .models import Employee, Payslip
 
 # Create your views here.
@@ -168,4 +163,3 @@ def ViewPayslip(request, pk):
     return render(request, 'payroll_app/view_payslip.html', {
         'payslip': payslip
     })
->>>>>>> be96a3a8574ff5b6aa19ec0d87743d524c7c0c59

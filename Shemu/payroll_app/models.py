@@ -4,11 +4,7 @@ from django.db import models
 
 class Employee(models.Model):
     name = models.CharField(max_length=300)
-<<<<<<< HEAD
-    id_number = models.CharField(max_length=100)
-=======
     id_number = models.CharField(max_length=100, unique=True)
->>>>>>> be96a3a8574ff5b6aa19ec0d87743d524c7c0c59
     rate = models.FloatField()
     overtime_pay = models.FloatField(null=True, blank=True)
     allowance = models.FloatField(null=True, blank=True)
@@ -28,20 +24,12 @@ class Employee(models.Model):
     
     def resetOvertime(self):
         self.overtime_pay = 0
-<<<<<<< HEAD
-        #idk if need to return smth here or do the "self.save()"" so the change will reflect also in the database
-    
-=======
         self.save()
 
->>>>>>> be96a3a8574ff5b6aa19ec0d87743d524c7c0c59
     def getAllowance(self):
         return self.allowance
     
     def __str__(self):
-<<<<<<< HEAD
-        return '{0}: {1}, rate: {2}'.format(self.pk, self.id_number, self.rate)
-=======
         return 'pk: {0}, rate: {1}'.format(self.id_number, self.rate)
 
 class Payslip (models.Model):
@@ -111,4 +99,3 @@ class Payslip (models.Model):
             self.pay_cycle,
             self.total_pay
         )    
->>>>>>> be96a3a8574ff5b6aa19ec0d87743d524c7c0c59

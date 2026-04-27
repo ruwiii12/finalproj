@@ -19,10 +19,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-<<<<<<< HEAD
-    path('admin/', admin.site.urls),
-    #insert here the needed urls for the app
-=======
     #Employees
     path('', views.EmployeesPage, name='employees'),
     path('create/', views.CreateEmployee, name='create_employee'),
@@ -33,5 +29,4 @@ urlpatterns = [
     #Payslips
     path('payslips/', views.PayslipPage, name='payslips'),
     path('payslip/<int:pk>/', views.ViewPayslip, name='view_payslip'),
->>>>>>> be96a3a8574ff5b6aa19ec0d87743d524c7c0c59
 ]
