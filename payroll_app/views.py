@@ -121,12 +121,12 @@ def PayslipPage(request):
                 pag_ibig = 100
                 health = 0
                 sss = 0
-                taxable_income = (cycle_rate + allowance + overtime - pag_ibig)
+                taxable_income = (cycle_rate + allowance + overtime) - pag_ibig
             else:
                 pag_ibig = 0
                 health = rate * 0.04
                 sss = rate * 0.045
-                taxable_income = (cycle_rate + allowance + overtime - health - sss)
+                taxable_income = (cycle_rate + allowance + overtime) - health - sss
 
             tax = taxable_income * 0.20
             total = taxable_income - tax
