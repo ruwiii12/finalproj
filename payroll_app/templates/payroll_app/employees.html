@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="table-top-row">
+    <h2 class="page-title mb-0">Employees</h2>
+    <a href="{% url 'create_employee' %}" class="btn-shemu-gold">+ New Employee</a>
+</div>
+
+<div class="shemu-table">
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID Number</th>
+                <th>Rate</th>
+                <th>Allowance</th>
+                <th>Overtime</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>{{ emp.getName }}</td>
+                <td>{{ emp.getID }}</td>
+                <td>{{ emp.getRate }}</td>
+                <td>{{ emp.getAllowance|default:"—" }}</td>
+                <td>{{ emp.getOvertime|default:"0" }}</td>
+                <td>
+                    <div class="d-flex flex-column gap-1">
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'update_employee' emp.pk %}" class="btn-shemu-primary">Update</a>
+                            <a href="{% url 'delete_employee' emp.pk %}"
+                               class="btn-shemu-danger"
+                               onclick="return confirm('Delete {{ emp.getName }}?')">Delete</a>
+                        </div>
+                        <form method="POST" action="{% url 'add_overtime' emp.pk %}">
+                            {% csrf_token %}
+                            <div class="overtime-group">
+                                <input type="number" name="hours" min="0" step="0.5" placeholder="Hours">
+                                <button type="submit" class="btn-shemu-success">Add Overtime</button>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4" style="font-style: italic;">
+                    No employees yet. Add one to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
