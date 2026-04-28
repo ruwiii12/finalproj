@@ -101,7 +101,7 @@ def PayslipPage(request):
             selected_employees = Employee.objects.filter(id_number=selected)
 
         for emp in selected_employees:
-            #prevent duplicate payslip
+            #prevents duplicate payslip
             if Payslip.objects.filter(
                 id_number=emp,
                 month=month,
@@ -147,9 +147,7 @@ def PayslipPage(request):
                 total_pay=total
             )
 
-            #Reset overtime AFTER creating payslip
             emp.resetOvertime()
-            emp.save()
 
         return redirect('payslips')
 
