@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from .models import Employee, Payslip
 
 # Create your views here.
@@ -100,7 +101,6 @@ def PayslipPage(request):
             selected_employees = Employee.objects.filter(id_number=selected)
 
         for emp in selected_employees:
-
             #prevent duplicate payslip
             if Payslip.objects.filter(
                 id_number=emp,
@@ -108,6 +108,7 @@ def PayslipPage(request):
                 year=year,
                 pay_cycle=cycle
             ).exists():
+                messages.error(request, 'Payslip already exists for {0} for {1} {2}, Cycle {3}.'.format(emp.name, month, year, cycle))
                 continue
 
             rate = emp.rate
@@ -116,18 +117,19 @@ def PayslipPage(request):
             overtime = emp.overtime_pay if emp.overtime_pay else 0
 
             # deductions
-            tax = cycle_rate * 0.20
-
             if cycle == 1:
                 pag_ibig = 100
                 health = 0
                 sss = 0
+                taxable_income = (cycle_rate + allowance + overtime - pag_ibig)
             else:
                 pag_ibig = 0
-                health = cycle_rate * 0.04
-                sss = cycle_rate * 0.045
+                health = rate * 0.04
+                sss = rate * 0.045
+                taxable_income = (cycle_rate + allowance + overtime - health - sss)
 
-            total = cycle_rate + allowance + overtime - (tax + health + sss + pag_ibig)
+            tax = taxable_income * 0.20
+            total = taxable_income - tax
 
             Payslip.objects.create(
                 id_number=emp,
@@ -135,7 +137,7 @@ def PayslipPage(request):
                 date_range="1-15" if cycle == 1 else "16-30",
                 year=year,
                 pay_cycle=cycle,
-                rate=cycle_rate,
+                rate=rate,
                 earnings_allowance=allowance,
                 deductions_tax=tax,
                 deductions_health=health,
@@ -147,12 +149,14 @@ def PayslipPage(request):
 
             #Reset overtime AFTER creating payslip
             emp.resetOvertime()
+            emp.save()
 
         return redirect('payslips')
 
     return render(request, 'payroll_app/payslips.html', {
         'employees': employees,
-        'payslips': payslips
+        'payslips': payslips,
+        'months': ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     })
 
 
