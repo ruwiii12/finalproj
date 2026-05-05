@@ -72,26 +72,27 @@
             letter-spacing: 0.12em;
             cursor: pointer;
             transition: color 0.2s;
+            padding: 0.45rem 1rem;
         }
 
         .logout-btn:hover {
             color: var(--gold);
         }
 
+        .welcome-text {
+            color: #c8d0e0;
+            font-size: 0.85rem;
+            margin-right: 1rem;
+        }
+
+        .welcome-text span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
         .main-content {
             flex: 1;
             padding: 2.5rem 2rem;
-        }
-
-        .page-title {
-            font-size: 1.9rem;
-            color: var(--navy);
-            font-weight: bold;
-            letter-spacing: 0.04em;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 0.4rem;
-            display: inline-block;
         }
 
         .footer-shemu {
@@ -116,25 +117,39 @@
         <small>PAYROLL SYSTEM</small>
     </a>
 
-    {% if user.is_authenticated or display_name %}
     <div class="d-flex align-items-center gap-2">
-        {% if is_admin %}
-            <a href="{% url 'employees_page' %}"
-               class="nav-link-shemu {% if request.resolver_match.url_name == 'employees_page' or request.resolver_match.url_name == 'create_employee' %}active{% endif %}">
-                Employees
+        {% if user.is_authenticated or display_name %}
+            <!-- Welcome Identity -->
+            <div class="welcome-text d-none d-md-block">
+                Welcome, <span>{{ display_name|default:"User" }}</span>
+            </div>
+
+            <!-- Navigation Links -->
+            {% if is_admin %}
+                <a href="{% url 'employees_page' %}"
+                   class="nav-link-shemu {% if request.resolver_match.url_name == 'employees_page' or request.resolver_match.url_name == 'create_employee' %}active{% endif %}">
+                    Employees
+                </a>
+            {% endif %}
+            
+            <a href="{% url 'payslips_page' %}"
+               class="nav-link-shemu {% if request.resolver_match.url_name == 'payslips_page' or request.resolver_match.url_name == 'view_payslip' %}active{% endif %}">
+                Payslips
+            </a>
+
+            <!-- Logout Form -->
+            <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        {% else %}
+            <!-- Show Login if not authenticated -->
+            <a href="{% url 'login' %}" 
+               class="nav-link-shemu {% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+                Login
             </a>
         {% endif %}
-        <a href="{% url 'payslips_page' %}"
-           class="nav-link-shemu {% if request.resolver_match.url_name == 'payslips_page' or request.resolver_match.url_name == 'view_payslip' %}active{% endif %}">
-            Payslips
-        </a>
-
-        <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
     </div>
-    {% endif %}
 </nav>
 
 <!-- PAGE CONTENT -->

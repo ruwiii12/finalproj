@@ -1,6 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="page-title">View Payslip</h2>
-<p class="text-muted" style="font-style:italic;">View payslip TBA.</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">Payslip Details</h2>
+        <a href="{% url 'payslips_page' %}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm border-0" style="background-color: var(--card-bg); border-radius: 8px;">
+        <div class="card-body p-5">
+            
+            <!-- SECTION 1: General Payslip Details -->
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted small text-uppercase">Employee Name</p>
+                    <h5 class="fw-bold">{{ payslip.id_number.name }}</h5>
+                    <p class="mb-0 text-muted small text-uppercase mt-3">ID Number</p>
+                    <h5 class="fw-bold">{{ payslip.id_number.id_number }}</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1 text-muted small text-uppercase">Period</p>
+                    <h5 class="fw-bold">{{ payslip.month }} {{ payslip.date_range }}, {{ payslip.year }}</h5>
+                    <p class="mb-0 text-muted small text-uppercase mt-3">Payslip ID</p>
+                    <h5 class="fw-bold">#{{ payslip.pk }}</h5>
+                </div>
+            </div>
+
+            <hr class="my-4" style="border-top: 2px solid var(--gold-light); opacity: 0.3;">
+
+            <div class="row">
+                <!-- SECTION 2: Earnings -->
+                <div class="col-md-6 border-end">
+                    <h6 class="text-uppercase fw-bold mb-3" style="color: var(--navy); letter-spacing: 0.1em;">Earnings</h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="ps-0">Base Pay (Half-Month)</td>
+                            <td class="text-end pe-0">{{ payslip.getCycleRate }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-0">Allowances</td>
+                            <td class="text-end pe-0">{{ payslip.earnings_allowance }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-0">Overtime</td>
+                            <td class="text-end pe-0">{{ payslip.overtime }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- SECTION 3: Deductions -->
+                <div class="col-md-6">
+                    <h6 class="text-uppercase fw-bold mb-3 ms-md-3" style="color: var(--navy); letter-spacing: 0.1em;">Deductions</h6>
+                    <table class="table table-borderless ms-md-3">
+                        <tr>
+                            <td class="ps-0">W/Holding Tax</td>
+                            <td class="text-end pe-0">{{ payslip.deductions_tax }}</td>
+                        </tr>
+                        
+                        {# CYCLE 1: Show ONLY Pag-ibig #}
+                        {% if payslip.pay_cycle == 1 %}
+                        <tr>
+                            <td class="ps-0 text-primary small">Pag-ibig (Cycle 1)</td>
+                            <td class="text-end pe-0">{{ payslip.pag_ibig }}</td>
+                        </tr>
+                        {% endif %}
+
+                        {# CYCLE 2: Show PhilHealth and SSS #}
+                        {% if payslip.pay_cycle == 2 %}
+                        <tr>
+                            <td class="ps-0 text-primary small">PhilHealth (Cycle 2)</td>
+                            <td class="text-end pe-0">{{ payslip.deductions_health }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-0 text-primary small">SSS (Cycle 2)</td>
+                            <td class="text-end pe-0">{{ payslip.sss }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <hr class="my-4" style="border-top: 2px solid var(--gold-light); opacity: 0.3;">
+
+            <!-- SECTION 4: Net Pay -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <h4 class="text-uppercase fw-bold mb-0" style="color: var(--navy);">Net Pay</h4>
+                <div class="text-end">
+                    <h3 class="fw-bold mb-0" style="color: var(--navy);">PHP {{ payslip.total_pay }}</h3>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}

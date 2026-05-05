@@ -34,17 +34,18 @@ def EmployeeOf(account):
 
 
 def DisplayName(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated:
         return "Admin"
-    account = CurrentAccount(request)
-    if not account:
-        return ""
-    if account.is_admin:
-        return "Admin"
-    employee = Employee.objects.filter(account_id=account).first()
-    if employee:
-        return employee.getName()
-    return account.username
+    
+    user_id = request.session.get("user_id")
+    if user_id:
+        account = Account.objects.filter(pk=user_id).first()
+        if account:
+            if account.is_admin:
+                return "Admin"
+            employee = Employee.objects.filter(account_id=account).first()
+            return employee.getName() if employee else account.username
+    return ""
 
 
 # ─────────────── FLASH MESSAGES ───────────────
@@ -266,13 +267,16 @@ def CreateEmployee(request):
     })
 
 
-def DeleteEmployee(request, primary_key):
+def DeleteEmployee(request, pk):
     guard = AdminOnly(request)
-    if guard:
-        return guard
-    if request.method != "POST":
-        FlashError(request, "Employees can only be deleted using the delete button.")
-        return redirect("employees_page")
+    if guard: return guard
+    
+    if request.method == "POST":
+        employee = get_object_or_404(Employee, pk=pk)
+        name = employee.getName()
+        employee.delete()
+        FlashSuccess(request, f"Employee {name} deleted.")
+    return redirect("employees_page")
 
     employee = get_object_or_404(Employee, pk=primary_key)
     name = employee.getName()
@@ -283,52 +287,32 @@ def DeleteEmployee(request, primary_key):
 
 # ─────────────── OVERTIME ───────────────
 
-def AddOvertime(request, primary_key):
+def AddOvertime(request, pk):
     guard = AdminOnly(request)
-    if guard:
-        return guard
+    if guard: return guard
 
-    employee = get_object_or_404(Employee, pk=primary_key)
-    if request.method != "POST":
-        return redirect("employees_page")
-
-    hours_value = request.POST.get("hours", "").strip()
-    if not hours_value:
-        FlashError(request, "Enter overtime hours first.")
-        return redirect("employees_page")
-
-    try:
-        hours = float(hours_value)
-    except ValueError:
-        FlashError(request, "Overtime hours must be a valid number.")
-        return redirect("employees_page")
-
-    if hours <= 0:
-        FlashError(request, "Overtime hours must be more than 0.")
-        return redirect("employees_page")
-    if hours > 744:
-        FlashError(request, "Overtime hours cannot exceed 744.")
-        return redirect("employees_page")
-
-    current_overtime = employee.getOvertime() or 0
-    overtime_amount = RoundAmount((employee.getRate() / 160) * 1.5 * hours)
-    employee.overtime_pay = RoundAmount(current_overtime + overtime_amount)
-    employee.save()
-
-    message = "Added PHP " + str(overtime_amount) + " overtime pay for " + employee.getName() + "."
-    FlashSuccess(request, message)
+    employee = get_object_or_404(Employee, pk=pk)
+    if request.method == "POST":
+        hours = request.POST.get("hours", "0")
+        try:
+            h = float(hours)
+            if 0 < h <= 744:
+                overtime_amount = (employee.getRate() / 160) * 1.5 * h
+                employee.overtime_pay = (employee.overtime_pay or 0) + overtime_amount
+                employee.save()
+                FlashSuccess(request, f"Added overtime for {employee.getName()}")
+            else:
+                FlashError(request, "Invalid hours.")
+        except ValueError:
+            FlashError(request, "Please enter a number.")
     return redirect("employees_page")
 
 
 # ─────────────── LOGIN AND LOGOUT (Superuser Compatible) ───────────────
 
 def LoginView(request):
-    # Redirect logged-in users
-    if request.user.is_authenticated:
-        if request.user.is_superuser or request.session.get("is_admin"):
-            return redirect("employees_page")
-        else:
-            return redirect("payslips_page")
+    if request.user.is_authenticated or request.session.get("user_id"):
+        return redirect("employees_page") if request.session.get("is_admin") else redirect("payslips_page")
 
     success, error = GetFlash(request)
 
@@ -336,26 +320,21 @@ def LoginView(request):
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "").strip()
 
-        if not username or not password:
-            error = "Username and password are required."
-        else:
-            # Django superuser authentication
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                request.session["is_admin"] = user.is_superuser
-                return redirect("employees_page")
+        # Try Django Superuser first
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            request.session["is_admin"] = True
+            return redirect("employees_page")
 
-            # Fallback: check internal Account table
-            account = Account.objects.filter(username=username, password=password).first()
-            if account:
-                request.session["user_id"] = account.pk
-                request.session["is_admin"] = account.is_admin
-                if account.is_admin:
-                    return redirect("employees_page")
-                return redirect("payslips_page")
+        # Try custom Account table
+        account = Account.objects.filter(username=username, password=password).first()
+        if account:
+            request.session["user_id"] = account.pk
+            request.session["is_admin"] = account.is_admin
+            return redirect("employees_page") if account.is_admin else redirect("payslips_page")
 
-            error = "Invalid username or password."
+        error = "Invalid username or password."
 
     return render(request, "payroll_app/login.html", {"ok": success, "error": error})
 
