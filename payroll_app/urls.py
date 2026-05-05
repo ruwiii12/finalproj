@@ -19,14 +19,22 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    #Employees
-    path('', views.EmployeesPage, name='employees'),
-    path('create/', views.CreateEmployee, name='create_employee'),
-    path('update/<int:pk>/', views.UpdateEmployee, name='update_employee'),
-    path('delete/<int:pk>/', views.DeleteEmployee, name='delete_employee'),
-    path('overtime/<int:pk>/', views.AddOvertime, name='add_overtime'),
+    # Dashboard
+    path("", views.EmployeesPage, name="employees_page"),
 
-    #Payslips
-    path('payslips/', views.PayslipPage, name='payslips'),
-    path('payslip/<int:pk>/', views.ViewPayslip, name='view_payslip'),
+    # Employee Management
+    path("employees/", views.EmployeesPage, name="employees_page"),
+    path("employees/create/", views.CreateEmployee, name="create_employee"),
+    path("employees/update/<int:pk>/", views.UpdateEmployee, name="update_employee"),
+    path("employees/delete/<int:pk>/", views.DeleteEmployee, name="delete_employee"),
+    path("employees/overtime/<int:pk>/", views.AddOvertime, name="add_overtime"),
+
+    # Payslips Management
+    path("payslips/", views.PayslipsPage, name="payslips_page"),
+    path("payslip/<int:pk>/", views.ViewPayslip, name="view_payslip"),
+    path("payslip/update/<int:pk>/", views.EditSlip, name="update_payslip"),
+    
+    # Authentication
+    path("login/", views.LoginView, name="login"),
+    path("logout/", views.LogoutView, name="logout"),
 ]

@@ -2,29 +2,34 @@
 
 {% block content %}
 <div class="container mt-4">
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+
+    {% if ok %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ ok }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     {% endif %}
-    
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {% if is_admin %}
     <h2 class="text-center mb-4">Payroll Creation</h2>
-    
+
     <div class="card p-4 shadow-sm mb-5 bg-light">
-        <form method="POST">{% csrf_token %}
-            
+        <form method="POST">
+            {% csrf_token %}
             <div class="row justify-content-center mb-3">
                 <div class="col-md-6 d-flex align-items-center">
-                    <label class="me-3 fw-bold" style="white-space: nowrap;">Payroll for:</label>
-                    <select name="employee" class="form-select" required>
+                    <label class="me-3 fw-bold">Payroll for:</label>
+                    <select name="payroll_for" class="form-select" required>
                         <option value="" selected disabled>Choose...</option>
-                        <option value="all">All Employees</option>
+                        <option value="ALL">All Employees</option>
                         {% for emp in employees %}
-                        <option value="{{ emp.id_number }}">{{ emp.id_number }} - {{ emp.name }}</option>
+                            <option value="{{ emp.id_number }}">{{ emp.id_number }} - {{ emp.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -38,7 +43,7 @@
                     <select name="month" class="form-select" required>
                         <option value="" selected disabled>Choose...</option>
                         {% for m in months %}
-                        <option value="{{ m }}">{{ m }}</option>
+                            <option value="{{ m }}">{{ m }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -63,31 +68,36 @@
             </div>
         </form>
     </div>
+    {% endif %}
 
-    <h3>Payslips Summary</h3>
-    <table class="table table-bordered align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>ID Number</th>
-                <th>Date</th>
-                <th>Cycle</th>
-                <th>Total Pay</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ps in payslips %}
-            <tr>
-                <td>{{ ps.id_number.id_number }}</td>
-                <td>{{ ps.month }} {{ ps.date_range }}, {{ ps.year }}</td>
-                <td>{{ ps.pay_cycle }}</td>
-                <td>PHP {{ ps.total_pay|floatformat:2 }}</td>
-                <td>
-                    <a href="{% url 'view_payslip' ps.pk %}" class="btn btn-info btn-sm text-white">View</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h3 class="mb-3">Payslips Summary</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Number</th>
+                    <th>Date</th>
+                    <th>Cycle</th>
+                    <th>Total Pay</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payslip in payslips %}
+                    <tr>
+                        <td>{{ payslip.id_number.id_number }}</td>
+                        <td>{{ payslip.month }} {{ payslip.date_range }}, {{ payslip.year }}</td>
+                        <td>{{ payslip.pay_cycle }}</td>
+                        <td>PHP {{ payslip.total_pay|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'view_payslip' payslip.pk %}" class="btn btn-info btn-sm text-white">View</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center">No payslips available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

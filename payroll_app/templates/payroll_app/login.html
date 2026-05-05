@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Shemu Payroll</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'payroll_app/css/login.css' %}">
+</head>
+
+<body class="login-body">
+
+<main class="login-wrapper container-fluid d-flex align-items-center justify-content-center min-vh-100">
+    <section class="login-card">
+
+        <div class="login-left">
+            <h1>Sign In</h1>
+            <p class="login-subtitle">Access payroll records and payslip details through your account.</p>
+
+            {% if ok %}
+                <div class="alert alert-success">{{ ok }}</div>
+            {% endif %}
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form method="post" class="login-form">
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    autocomplete="username"
+                    required
+                >
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+
+        <div class="login-right">
+            <div>
+                <h2>Welcome Back</h2>
+                <p>Continue to Shemu!</p>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

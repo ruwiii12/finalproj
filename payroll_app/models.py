@@ -2,7 +2,30 @@ from django.db import models
 
 # Create your models here.
 
+class Account(models.Model):
+    username = models.CharField(max_length=100, unique=True)
+    password = models.CharField(max_length=100)
+
+    admin = models.BooleanField(default=False)
+
+    objects = models.Manager()
+
+    def getUsername(self):
+        return self.username
+    
+    def getPassword(self):
+        return self.password
+    
+    def getIsAdmin(self):
+        return self.admin
+    
+    def __str__(self):
+        return 'pk: {0}, username: {1}, admin: {2}'.format(self.pk, self.username, self.admin)
+
 class Employee(models.Model):
+
+    id_account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True,)
+
     name = models.CharField(max_length=300)
     id_number = models.CharField(max_length=100, unique=True)
     rate = models.FloatField()
@@ -20,6 +43,9 @@ class Employee(models.Model):
         return self.rate
     
     def getOvertime(self):
+        if self.overtime_pay is None:
+            return 0
+
         return self.overtime_pay
     
     def resetOvertime(self):
@@ -27,6 +53,8 @@ class Employee(models.Model):
         self.save()
 
     def getAllowance(self):
+        if self.allowance is None:
+            return 0
         return self.allowance
     
     def __str__(self):
@@ -40,12 +68,13 @@ class Payslip (models.Model):
     pay_cycle = models.IntegerField()
     rate = models.FloatField()
     earnings_allowance = models.FloatField()
-    deductions_tax = models.FloatField()
-    deductions_health = models.FloatField()
-    pag_ibig = models.FloatField()
-    sss = models.FloatField()
+    deductions_tax = models.FloatField(default=0)
+    deductions_health = models.FloatField(default=0)
+    pag_ibig = models.FloatField(default=0)
+    sss = models.FloatField(default=0)
     overtime = models.FloatField(default = 0)
-    total_pay = models.FloatField()
+    total_pay = models.FloatField(default=0)
+    objects = models.Manager()
 
     def getIDNumber(self):
         return self.id_number.id_number
@@ -63,7 +92,7 @@ class Payslip (models.Model):
         return self.pay_cycle
     
     def getCycleRate(self):
-        return self.rate / 2
+        return round(self.rate / 2, 2)
     
     def getRate(self):
         return self.rate
@@ -99,3 +128,6 @@ class Payslip (models.Model):
             self.pay_cycle,
             self.total_pay
         )    
+
+class PayrollStatus:
+        unique_together = ('id_number','month','year','pay_cycle')

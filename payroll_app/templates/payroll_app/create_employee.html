@@ -1,7 +1,10 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="form-card">
+    {% if error %}
+        <div class="alert alert-danger mb-3">{{ error }}</div>
+    {% endif %}
     <h2 class="page-title" style="font-size:1.5rem;">Create Employee</h2>
 
     <form method="POST">
@@ -9,22 +12,32 @@
 
         <div class="mb-3">
             <label class="form-label">Name</label>
-            <input type="text" name="name" class="form-control" required>
+            <input type="text" name="name" class="form-control" value="{{ form_values.name }}" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">ID Number</label>
-            <input type="text" name="id_number" class="form-control" required>
+            <input type="text" name="id_number" class="form-control" value="{{ form_values.id_number }}" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Rate</label>
-            <input type="number" name="rate" class="form-control" step="0.01" min="0" required>
+            <input type="number" name="rate" class="form-control" step="0.01" min="0" value="{{ form_values.rate }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Allowance <span style="color:#999; font-size:0.8rem;">(Optional)</span></label>
+            <input type="number" name="allowance" class="form-control" step="0.01" min="0" value="{{ form_values.allowance }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" value="{{ form_values.username }}" required>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">Allowance <span style="color:#999; font-size:0.8rem;">(Optional)</span></label>
-            <input type="number" name="allowance" class="form-control" step="0.01" min="0">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" value="{{ form_values.password }}" required>
         </div>
 
         <button type="submit" class="btn-shemu-gold w-100" style="padding: 0.55rem;">Submit</button>
