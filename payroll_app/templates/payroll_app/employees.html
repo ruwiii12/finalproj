@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="table-top-row">
+    <h2 class="page-title mb-0">Employees</h2>
+    <a href="{% url 'create_employee' %}" class="btn-shemu-gold">+ New Employee</a>
+</div>
+
+{% if ok %}
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        {{ ok }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endif %}
+{% if error %}
+    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endif %}
+
+<div class="shemu-table">
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID Number</th>
+                <th>Rate</th>
+                <th>Allowance</th>
+                <th>Overtime</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ employee.getName }}</td>
+                <td>{{ employee.getID }}</td>
+                <td>{{ employee.getRate }}</td>
+                <td>{{ employee.getAllowance }}</td>
+                <td>{{ employee.getOvertime }}</td>
+                <td>
+                    <div class="d-flex flex-column gap-1">
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="{% url 'update_employee' employee.pk %}" class="btn-shemu-primary">Update</a>
+                            <form method="POST" action="{% url 'delete_employee' employee.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-shemu-danger"
+                                        onclick="return confirm('Delete {{ employee.getName }}? This cannot be undone.')">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                        <form method="POST" action="{% url 'add_overtime' employee.pk %}">
+                            {% csrf_token %}
+                            <div class="overtime-group">
+                                <input type="number" name="hours" min="0.5" step="0.5" placeholder="Hours">
+                                <button type="submit" class="btn-shemu-success">Add Overtime</button>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4" style="font-style:italic;">
+                    No employees found. Click <strong>+ New Employee</strong> to add one.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

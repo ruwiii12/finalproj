@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<section class="container mt-5" style="max-width: 1100px;">
+    {% if ok %}
+        <div class="alert alert-success">{{ ok }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <h2 class="mb-4 text-center">Edit Payslip Record</h2>
+
+    <form method="POST" class="card p-4 shadow-sm bg-light">
+        {% csrf_token %}
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Payroll For</label>
+                <input type="text" class="form-control" value="{{ form_values.payroll_for }} — {{ payslip.id_number.getName }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Month</label>
+                <select name="month" class="form-select" required>
+                    <option value="">Select month</option>
+                    {% for month in months %}
+                    <option value="{{ month }}" {% if form_values.month == month %}selected{% endif %}>{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Year</label>
+                <input type="text" name="year" class="form-control" maxlength="4" value="{{ form_values.year }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Cycle</label>
+                <select name="cycle" class="form-select" required>
+                    <option value="">Select cycle</option>
+                    <option value="1" {% if form_values.cycle == '1' %}selected{% endif %}>1</option>
+                    <option value="2" {% if form_values.cycle == '2' %}selected{% endif %}>2</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Rate</label>
+                <input type="number" name="rate" min="0" step="0.01" class="form-control" value="{{ form_values.rate }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Earnings Allowance</label>
+                <input type="number" name="earnings_allowance" min="0" step="0.01" class="form-control" value="{{ form_values.earnings_allowance }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Overtime</label>
+                <input type="number" name="overtime" min="0" step="0.01" class="form-control" value="{{ form_values.overtime }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Date Range</label>
+                <input type="text" class="form-control" value="{{ form_values.date_range }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Deductions Tax</label>
+                <input type="number" step="0.01" class="form-control" value="{{ form_values.deductions_tax }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Deductions Health</label>
+                <input type="number" step="0.01" class="form-control" value="{{ form_values.deductions_health }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Pag-ibig</label>
+                <input type="number" step="0.01" class="form-control" value="{{ form_values.pag_ibig }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">SSS</label>
+                <input type="number" step="0.01" class="form-control" value="{{ form_values.sss }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Total Pay</label>
+                <input type="number" step="0.01" class="form-control" value="{{ form_values.total_pay }}" readonly>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-start gap-2">
+            <button class="btn btn-primary" type="submit">Update Payslip</button>
+            <a class="btn btn-secondary" href="{% url 'view_payslip' pk=payslip.pk %}">Back</a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

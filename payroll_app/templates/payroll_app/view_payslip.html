@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 750px; margin: 0 auto;">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="page-title mb-0">Payslip Details</h2>
+        <a href="{% url 'payslips_page' %}" class="btn-shemu-primary">← Back to List</a>
+    </div>
+
+    <!-- Payslip Card -->
+    <div style="background:#fff; border-radius:6px; box-shadow:0 2px 16px rgba(26,37,64,0.1); overflow:hidden;">
+
+        <!-- Header bar -->
+        <div style="background:var(--navy); padding:1rem 1.8rem; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div style="color:var(--gold); font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;">Employee</div>
+                <div style="color:#fff; font-size:1.05rem; font-weight:bold; margin-top:0.15rem;">{{ payslip.id_number.name }}</div>
+                <div style="color:#8896b0; font-size:0.82rem; margin-top:0.1rem;">ID: {{ payslip.id_number.id_number }}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="color:var(--gold); font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;">Pay Period</div>
+                <div style="color:#fff; font-size:1.05rem; font-weight:bold; margin-top:0.15rem;">{{ payslip.month }} {{ payslip.date_range }}, {{ payslip.year }}</div>
+                <div style="color:#8896b0; font-size:0.82rem; margin-top:0.1rem;">Payslip ID: #{{ payslip.pk }}</div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 1.8rem;">
+
+            <!-- COLUMN HEADER -->
+            <div style="display:flex; justify-content:flex-end; padding-bottom:0.4rem; border-bottom:1px solid #eee; margin-bottom:0.8rem;">
+                <span style="font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:#999; width:120px; text-align:right;">Amount</span>
+            </div>
+
+            <!-- EARNINGS -->
+            <div style="font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--navy); font-weight:bold; margin-bottom:0.6rem;">
+                Earnings
+            </div>
+            <table style="width:100%; margin-bottom:1rem;">
+                <tr>
+                    <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">Base Pay (½ Rate)</td>
+                    <td style="text-align:right; color:#444; font-size:0.93rem; width:140px;">{{ payslip.getCycleRate }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">Allowances</td>
+                    <td style="text-align:right; color:#444; font-size:0.93rem;">{{ payslip.earnings_allowance }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">Overtime</td>
+                    <td style="text-align:right; color:#444; font-size:0.93rem;">{{ payslip.overtime }}</td>
+                </tr>
+                <tr style="border-top:1px solid #eee;">
+                    <td style="padding:0.5rem 0 0.25rem; color:var(--navy); font-size:0.9rem; font-weight:bold;">Gross Pay</td>
+                    <td style="text-align:right; color:var(--navy); font-size:0.9rem; font-weight:bold; padding-top:0.5rem;">
+                        PHP {{ payslip.getCycleRate|add:payslip.earnings_allowance }}
+                    </td>
+                </tr>
+            </table>
+
+            <!-- DEDUCTIONS -->
+            <div style="font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--navy); font-weight:bold; margin-bottom:0.6rem;">
+                Deductions
+            </div>
+            <table style="width:100%; margin-bottom:1rem;">
+                <tr>
+                    <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">W/Holding Tax</td>
+                    <td style="text-align:right; color:#444; font-size:0.93rem; width:140px;">{{ payslip.deductions_tax }}</td>
+                </tr>
+
+                {% if payslip.pay_cycle == 1 %}
+                    {# CYCLE 1: Pag-ibig only #}
+                    <tr>
+                        <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">Pag-ibig</td>
+                        <td style="text-align:right; color:#444; font-size:0.93rem;">{{ payslip.pag_ibig }}</td>
+                    </tr>
+                {% else %}
+                    {# CYCLE 2: PhilHealth + SSS only #}
+                    <tr>
+                        <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">PhilHealth</td>
+                        <td style="text-align:right; color:#444; font-size:0.93rem;">{{ payslip.deductions_health }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.25rem 0; color:#444; font-size:0.93rem;">SSS</td>
+                        <td style="text-align:right; color:#444; font-size:0.93rem;">{{ payslip.sss }}</td>
+                    </tr>
+                {% endif %}
+
+                <tr style="border-top:1px solid #eee;">
+                    <td style="padding:0.5rem 0 0.25rem; color:var(--navy); font-size:0.9rem; font-weight:bold;">Total Deductions</td>
+                    <td style="text-align:right; color:var(--navy); font-size:0.9rem; font-weight:bold; padding-top:0.5rem;">
+                        {% if payslip.pay_cycle == 1 %}
+                            PHP {{ payslip.deductions_tax|add:payslip.pag_ibig }}
+                        {% else %}
+                            PHP {{ payslip.deductions_tax|add:payslip.deductions_health|add:payslip.sss }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+
+            <!-- NET PAY -->
+            <div style="border-top:2px solid var(--gold); padding-top:1rem; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:1.1rem; font-weight:bold; color:var(--navy); letter-spacing:0.06em; text-transform:uppercase;">Net Pay</span>
+                <span style="font-size:1.4rem; font-weight:bold; color:var(--navy);">PHP {{ payslip.total_pay }}</span>
+            </div>
+
+        </div><!-- /body -->
+    </div><!-- /card -->
+
+    {% if is_admin %}
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'update_payslip' payslip.pk %}" class="btn-shemu-primary">Edit Payslip</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

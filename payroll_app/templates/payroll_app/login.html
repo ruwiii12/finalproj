@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Shemu Payroll</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Georgia', serif;
+        }
+
+        .login-card {
+            display: flex;
+            width: 700px;
+            max-width: 95vw;
+            min-height: 380px;
+            margin: 80px auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        .login-left {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .login-left h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .login-subtitle {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 1.2rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+        }
+
+        .login-form button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 0.55rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 0.2rem;
+        }
+
+        .login-form button:hover {
+            background-color: #555;
+        }
+
+        .login-right {
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .login-right h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .login-right p {
+            font-size: 0.82rem;
+            color: #ccc;
+        }
+
+        @media (max-width: 580px) {
+            .login-right { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="login-left">
+        <h1>Sign In</h1>
+        <p class="login-subtitle">Access payroll records and payslip details through your account.</p>
+
+        {% if ok %}
+            <div class="alert alert-success">{{ ok }}</div>
+        {% endif %}
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" class="login-form">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" autocomplete="username" required>
+            <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <div class="login-right">
+        <div>
+            <h2>Welcome!</h2>
+            <p>Continue to Shemu</p>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if ok %}
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        {{ ok }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endif %}
+{% if error %}
+    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endif %}
+
+{% if is_admin %}
+<!-- ── PAYROLL CREATION FORM ── -->
+<div style="background: #fff; border-radius: 6px; box-shadow: 0 2px 12px rgba(26,37,64,0.09); padding: 1.8rem 2rem; margin-bottom: 2rem;">
+    <h3 class="page-title" style="font-size:1.4rem; margin-bottom:1.2rem;">Payroll Creation</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Payroll For -->
+        <div class="row mb-3 align-items-center">
+            <label class="col-sm-2 form-label mb-0">Payroll for:</label>
+            <div class="col-sm-6">
+                <select name="payroll_for" class="form-select" required>
+                    <option value="" selected disabled>Choose...</option>
+                    <option value="ALL">All Employees</option>
+                    {% for emp in employees %}
+                        <option value="{{ emp.id_number }}">{{ emp.id_number }} — {{ emp.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Month / Year / Cycle in one row -->
+        <div class="row mb-3 align-items-center g-3">
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label class="form-label mb-0">Month:</label>
+                <select name="month" class="form-select" required>
+                    <option value="" selected disabled>Choose...</option>
+                    {% for m in months %}
+                        <option value="{{ m }}">{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label class="form-label mb-0">Year:</label>
+                <input type="text" name="year" class="form-control" placeholder="YYYY" style="width:100px;" required>
+            </div>
+
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label class="form-label mb-0">Cycle:</label>
+                <select name="cycle" class="form-select" required>
+                    <option value="" selected disabled>Choose...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn-shemu-gold" style="padding:0.45rem 1.5rem;">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<!-- ── PAYSLIPS SUMMARY TABLE ── -->
+<h3 class="page-title" style="font-size:1.4rem;">Payslips Summary</h3>
+<div class="shemu-table">
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>ID Number</th>
+                <th>Date</th>
+                <th>Cycle</th>
+                <th>Total Pay</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payslip in payslips %}
+            <tr>
+                <td>{{ payslip.id_number.id_number }}</td>
+                <td>{{ payslip.month }} {{ payslip.date_range }}, {{ payslip.year }}</td>
+                <td>{{ payslip.pay_cycle }}</td>
+                <td>PHP {{ payslip.total_pay|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'view_payslip' payslip.pk %}" class="btn-shemu-primary">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4" style="font-style:italic;">
+                    No payslips yet. Generate one using the form above.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
